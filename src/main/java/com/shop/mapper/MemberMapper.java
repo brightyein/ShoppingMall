@@ -1,0 +1,13 @@
+package com.shop.mapper;
+
+import com.shop.model.MemberVO;
+
+public interface MemberMapper {
+	
+	// 회원가입
+	public void memberJoin(MemberVO member);
+
+	// 아이디 중복체크
+	public int idCheck(String memberId);
+
+}
