@@ -23,6 +23,18 @@
 	
 	<context:component-scan base-package="com.shop.controller" />
 	
-	
+	<!-- Interceptor 적용 -->
+	<interceptors>
+		<!-- 로그인 시 세션 제거 처리 -->
+		<interceptor>
+			<mapping path="/member/login.do"/>
+			<beans:bean id="loginTnterceptor" class="com.shop.interceptor.LoginInterceptor"></beans:bean>
+		</interceptor>
+		<!-- 관리자 페이지 접근 시 권한 확인 -->
+		<interceptor>
+			<mapping path="/admin/**"/>
+			<beans:bean id="AdminInterceptor" class="com.shop.interceptor.AdminInterceptor"></beans:bean>
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>

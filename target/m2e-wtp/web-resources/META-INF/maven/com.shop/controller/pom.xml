@@ -207,6 +207,13 @@
 		    <version>5.4.2</version>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-webmvc -->
+		<dependency>
+		    <groupId>org.springframework</groupId>
+		    <artifactId>spring-webmvc</artifactId>
+		    <version>${org.springframework-version}</version>
+		</dependency>
+		
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
