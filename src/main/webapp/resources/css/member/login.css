@@ -61,7 +61,6 @@
 	font-size:28px;
 }
 
-
 .login_button_wrap{
 	margin-top: 40px;
 	text-align: center;
@@ -74,6 +73,13 @@
     font-weight: 900;
     color: white;
     margin : auto;
+}
+
+/* 로그인 실패 시 경고글 */
+.login_warn{
+	margin-top: 30px;
+	text-align: center;
+	color: red;
 }
 
 /* float 속성 해제 */

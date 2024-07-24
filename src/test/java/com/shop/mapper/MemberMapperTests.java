@@ -38,5 +38,17 @@ public class MemberMapperTests {
 		memberMapper.idCheck(id);
 		memberMapper.idCheck(id2);
 	}
+	
+	// 로그인
+	@Test
+	public void memberLogin() throws Exception{
+		MemberVO member =  new MemberVO();
+		
+		member.setMemberId("wmfrjqsp");
+		member.setMemberPw("wmfrjqsp");
+		
+		memberMapper.memberLogin(member);
+		System.out.println("결과값 : " + memberMapper.memberLogin(member));
+	}
 
 }

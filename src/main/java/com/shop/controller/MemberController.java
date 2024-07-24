@@ -3,17 +3,21 @@ package com.shop.controller;
 import java.util.Random;
 
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.shop.model.MemberVO;
 import com.shop.service.MemberService;
@@ -30,6 +34,9 @@ public class MemberController {
 	@Autowired
 	private JavaMailSender mailSender;
 	
+	@Autowired
+	private BCryptPasswordEncoder pwEncoder;
+	
 	/* 회원가입 페이지 이동 */
 	@GetMapping("join")
 	public void joinGET() {
@@ -40,11 +47,15 @@ public class MemberController {
 	@PostMapping("/join")
 	public String joinPOST(MemberVO member) throws Exception {
 		
-		logger.info("join 진입");
+		String rawPw = ""; // 인코딩 전
+		String encodePw = ""; // 인코딩 후 
 		
-		//회원가입 서비스 실행
+		rawPw = member.getMemberPw(); // 입력받은 비밀번호
+		encodePw = pwEncoder.encode(rawPw); // 비밀번호 인코딩
+		member.setMemberPw(encodePw); // 인코딩된 비밀번호 저장
+		
 		memberService.memberJoin(member);
-		logger.info("join Service 성공");
+		
 		return "redirect:/main";
 	}
 	
@@ -57,7 +68,7 @@ public class MemberController {
 		int result = memberService.idCheck(memberId);
 		logger.info("결과값 = " + result);
 		
-		if (result !=0 ) {
+		if (result !=0) {
 			return "fail"; 
 		} else {
 			return "success"; 
@@ -113,6 +124,59 @@ public class MemberController {
 	public void loginGET() {
 		logger.info("로그인 페이지 진입");
 	}
+	
+	/* 로그인 */
+	@PostMapping("/login")
+	public String loginPOST(HttpServletRequest request, MemberVO member, RedirectAttributes rttr) throws Exception {
+		
+		HttpSession session = request.getSession();
+		
+		String rawPw = "";
+		String encodePw = "";
+		
+		MemberVO loginMember = memberService.memberLogin(member);
+		
+		if (loginMember != null) { // 아이디 일치 시
+			logger.info("아이디 일치");
+			rawPw = member.getMemberPw(); // 입력받은 비밀번호 
+			encodePw = loginMember.getMemberPw(); // 저장된 인코딩 비밀번호
+			
+			if (pwEncoder.matches(rawPw, encodePw) == true) { // 비밀번호 일치여부 판단
+				logger.info("비밀번호 일치");
+				loginMember.setMemberPw(""); // 인코딩된 비밀번호 정보 지움
+				session.setAttribute("loginMember", loginMember);
+				return "redirect:/main"; // 메인페이지로 이동
+				
+			} else {
+				logger.info("비밀번호 불일치");
+				rttr.addFlashAttribute("result", 0);
+				return "redirect:/member/login"; // 로그인 페이지로 이동
+			}
+		} else { // 아이디 불일치 시
+			logger.info("아이디 불일치");
+			rttr.addFlashAttribute("result", 0);
+			return "redirect:/member/login";
+		}
 
+	}
+	
+	/* 로그아웃 */
+	@GetMapping("/logout.do")
+	public String logoutMainGET(HttpServletRequest request) throws Exception {
+		
+		HttpSession session = request.getSession();
+		session.invalidate();
+		
+		return "redirect:/main";
+		
+	}
+	
+	/* 비동기 로그아웃 */
+	@PostMapping("/logout.do")
+	@ResponseBody
+	public void logoutPOST(HttpServletRequest request) throws Exception{
+		HttpSession session = request.getSession();
+		session.invalidate();
+	}
 
 }
