@@ -41,4 +41,15 @@
   		</if>
   	</select>
   
+  	<!-- 작가 상세 페이지 -->
+  	<select id="authorGetDetail" resultType="com.shop.model.AuthorVO">
+  		select * from shop_author where authorid = #{authorId}
+  	</select>
+  	
+  	<!-- 작가 정보 수정 -->
+  	<update id="authorModify">
+  		update shop_author set authorName=#{authorName}, nationId=#{nationId}, authorInfo=#{authorInfo},
+  		updatedate=sysdate where authorId=#{authorId}
+  	</update>
+  
 </mapper>
